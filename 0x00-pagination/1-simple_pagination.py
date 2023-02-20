@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
 """ Simple pagination module """
-
 import csv
 from typing import List
 
 
 class Server:
-    """
-    Server class to paginate a database of popular baby names.
+    """Server class to paginate a database of popular baby names.
     """
     DATA_FILE = "Popular_Baby_Names.csv"
 
@@ -26,6 +24,9 @@ class Server:
         return self.__dataset
 
     def get_page(self, page: int = 1, page_size: int = 10) -> List[List]:
+        """
+        Pagination list
+        """
         assert isinstance(page, int) and page > 0, "page should be a positive integer"
         assert isinstance(page_size, int) and page_size > 0, "page_size should be a positive integer"
         
@@ -34,6 +35,9 @@ class Server:
         
         
 def index_range(page: int, page_size: int) -> tuple:
+    """
+    Get pagination within index range
+    """
     start = (page - 1) * page_size
     end = page * page_size
     return (start, end)
