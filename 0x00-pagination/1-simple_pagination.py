@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-""" Simple pagination """
+""" Simple pagination module """
 import csv
-import math
-from typing import List, Tuple
+from typing import List
 
 
 class Server:
@@ -26,23 +25,19 @@ class Server:
 
     def get_page(self, page: int = 1, page_size: int = 10) -> List[List]:
         """
-        Pagination done
+        Pagination list
         """
-        assert isinstance(page, int) and page > 0
-        assert isinstance(page_size, int) and page_size > 0
-
-        range: Tuple = index_range(page, page_size)
-        pagination: List = self.dataset()
-
-        return (pagination[range[0]:range[1]])
-
-
-def index_range(page: int, page_size: int) -> Tuple[int, int]:
+        assert isinstance(page, int) and page > 0, "page should be a positive integer"
+        assert isinstance(page_size, int) and page_size > 0, "page_size should be a positive integer"
+        
+        start, end = index_range(page, page_size)
+        return self.dataset()[start:end]
+        
+        
+def index_range(page: int, page_size: int) -> tuple:
     """
-    Pagination within index range 
+    Get pagination within index range
     """
-
-    final_size: int = page * page_size
-    start_size: int = final_size - page_size
-
-    return (start_size, final_size)
+    start = (page - 1) * page_size
+    end = page * page_size
+    return (start, end)
