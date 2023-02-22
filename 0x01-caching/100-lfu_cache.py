@@ -11,6 +11,17 @@ class LFUCache(BaseCaching):
         self.lru_cache = OrderedDict()
         self.lfu_cache = {}
 
+     def get(self, key):
+        """ Return the value linked """
+        if key in self.lru_cache:
+            value = self.lru_cache[key]
+            self.lru_cache.move_to_end(key)
+            if key in self.lfu_cache:
+                self.lfu_cache[key] += 1
+            else:
+                self.lfu_cache[key] = 1
+            return value
+
     def put(self, key, item):
         """ Assign to the dictionary, LFU algorithm """
         if key in self.lru_cache:
@@ -36,14 +47,3 @@ class LFUCache(BaseCaching):
         else:
             self.lfu_cache[key] = 1
         self.cache_data = dict(self.lru_cache)
-
-    def get(self, key):
-        """ Return the value linked """
-        if key in self.lru_cache:
-            value = self.lru_cache[key]
-            self.lru_cache.move_to_end(key)
-            if key in self.lfu_cache:
-                self.lfu_cache[key] += 1
-            else:
-                self.lfu_cache[key] = 1
-            return value
