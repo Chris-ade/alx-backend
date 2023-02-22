@@ -1,60 +1,49 @@
 #!/usr/bin/python3
-""" LFU Cache """
-
+""" LFU Caching """
 from base_caching import BaseCaching
+from collections import OrderedDict
 
 
 class LFUCache(BaseCaching):
-    """ LFU Cache class """
-
+    """ Class that inherits from BaseCaching and is a caching system """
     def __init__(self):
-        """ Initialize """
         super().__init__()
-        self.freq_count = {}
-        self.min_freq = 0
-
-    def get(self, key):
-        """ Return value linked to key """
-        if key is None or key not in self.cache_data:
-            return None
-
-        # update frequency count for key
-        value, freq = self.cache_data[key]
-        self.freq_count[key] += 1
-        if freq == self.min_freq and len(self.freq_count) > 1:
-            self.min_freq = min(self.freq_count.values())
-
-        return value
+        self.lru_cache = OrderedDict()
+        self.lfu_cache = {}
 
     def put(self, key, item):
-        """ Add key and value to cache """
-        if key is None or item is None:
-            return
-
-        if key in self.cache_data:
-            # update existing key
-            value, freq = self.cache_data[key]
-            self.cache_data[key] = (item, freq)
-            self.freq_count[key] += 1
-            if freq == self.min_freq and len(self.freq_count) > 1:
-                self.min_freq = min(self.freq_count.values())
+        """ Assign to the dictionary, LFU algorithm """
+        if key in self.lru_cache:
+            del self.lru_cache[key]
+        if len(self.lru_cache) > BaseCaching.MAX_ITEMS - 1:
+            min_value = min(self.lfu_cache.values())
+            lfu_keys = [k for k, v in self.lfu_cache.items() if v == min_value]
+            if len(lfu_keys) == 1:
+                print("DISCARD:", lfu_keys[0])
+                self.lru_cache.pop(lfu_keys[0])
+                del self.lfu_cache[lfu_keys[0]]
+            else:
+                for k, _ in list(self.lru_cache.items()):
+                    if k in lfu_keys:
+                        print("DISCARD:", k)
+                        self.lru_cache.pop(k)
+                        del self.lfu_cache[k]
+                        break
+        self.lru_cache[key] = item
+        self.lru_cache.move_to_end(key)
+        if key in self.lfu_cache:
+            self.lfu_cache[key] += 1
         else:
-            # add new key
-            if len(self.cache_data) >= self.MAX_ITEMS:
-                # discard LFU item(s)
-                discard_keys = [k for k in self.freq_count if self.freq_count[k] == self.min_freq]
-                if len(discard_keys) > 1:
-                    lru_key = min(self.access_time, key=lambda k: self.access_time[k])
-                    discard_keys.remove(lru_key)
-                for k in discard_keys:
-                    del self.cache_data[k]
-                    del self.freq_count[k]
-                    del self.access_time[k]
-                    print("DISCARD:", k)
+            self.lfu_cache[key] = 1
+        self.cache_data = dict(self.lru_cache)
 
-                self.min_freq += 1
-
-            self.cache_data[key] = (item, 1)
-            self.freq_count[key] = 1
-            self.access_time[key] = self.current_time
-            self.current_time += 1
+    def get(self, key):
+        """ Return the value linked """
+        if key in self.lru_cache:
+            value = self.lru_cache[key]
+            self.lru_cache.move_to_end(key)
+            if key in self.lfu_cache:
+                self.lfu_cache[key] += 1
+            else:
+                self.lfu_cache[key] = 1
+            return value
