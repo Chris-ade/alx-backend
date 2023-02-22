@@ -20,11 +20,12 @@ class LIFOCache(BaseCaching):
 
     def put(self, key, item):
         """
-        Assign to the dictionary self.cache_data the item value for the key key.
+        Assign to the dictionary self.cache_data the item value for the key.
         """
         if key is None or item is None:
             return
-        if len(self.cache_data) == BaseCaching.MAX_ITEMS and key not in self.cache_data:
+        count = len(self.cache_data)
+        if count == BaseCaching.MAX_ITEMS and key not in self.cache_data:
             last_key = self.keys.pop()
             del self.cache_data[last_key]
             print("DISCARD: {}".format(last_key))
