@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """
-Defines the LIFOCache class that inherits from BaseCaching and is a caching system
+LIFOCache class that inherits from BaseCaching and is a caching system
 """
 
 BaseCaching = __import__('base_caching').BaseCaching
